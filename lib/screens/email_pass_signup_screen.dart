@@ -19,7 +19,8 @@ class _EmailPassSignupScreenState extends State<EmailPassSignupScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("EMail Sign Up"),
+        elevation: 0.0,
+        title: Text("Sign Up"),
       ),
       body: SingleChildScrollView(
         child: Container(

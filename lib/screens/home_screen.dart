@@ -16,35 +16,66 @@ class HomeScreen extends StatelessWidget {
     return SafeArea(
       child: Scaffold(
         appBar: _appBar(context),
-        body: Obx(() {
-          _homeController.getTasks();
-          if (_homeController.state.value)
-            return Center(child: CircularProgressIndicator());
-          else if (_homeController.tasks.isEmpty)
-            return Container(
-              child: Center(
-                child: Image(
-                  image: AssetImage("assets/no_task.png"),
-                ),
-              ),
-            );
-
-          return ListView.builder(
-            itemCount: _homeController.tasks.length,
-            itemBuilder: (context, int index) {
-              return ListTile(
-                title: Text(_homeController.tasks[index].task),
-                onTap: null,
-                trailing: IconButton(
-                  icon: Icon(Icons.delete, color: Colors.red),
-                  onPressed: () {
-                    _homeController.deleteTask(taskID: _homeController.tasks[index].taskID);
-                  },
+        body: GetBuilder<HomeController>(
+          builder: (_) {
+            if (_homeController.state)
+              return Center(child: CircularProgressIndicator());
+            else if (_homeController.tasks.isEmpty)
+              return Container(
+                child: Center(
+                  child: Image(
+                    image: AssetImage("assets/no_task.png"),
+                  ),
                 ),
               );
-            },
-          );
-        }),
+
+            return ListView.builder(
+              itemCount: _homeController.tasks.length,
+              itemBuilder: (context, int index) {
+                return ListTile(
+                  title: Text(_homeController.tasks[index].task),
+                  onTap: null,
+                  trailing: IconButton(
+                    icon: Icon(Icons.delete, color: Colors.red),
+                    onPressed: () {
+                      _homeController.deleteTask(task: _homeController.tasks[index]);
+                    },
+                  ),
+                );
+              },
+            );
+          },
+        ),
+
+        //  Obx(() {
+        //   _homeController.getTasks();
+        //   if (_homeController.state.value)
+        //     return Center(child: CircularProgressIndicator());
+        //   else if (_homeController.tasks.isEmpty)
+        //     return Container(
+        //       child: Center(
+        //         child: Image(
+        //           image: AssetImage("assets/no_task.png"),
+        //         ),
+        //       ),
+        //     );
+
+        //   return ListView.builder(
+        //     itemCount: _homeController.tasks.length,
+        //     itemBuilder: (context, int index) {
+        //       return ListTile(
+        //         title: Text(_homeController.tasks[index].task),
+        //         onTap: null,
+        //         trailing: IconButton(
+        //           icon: Icon(Icons.delete, color: Colors.red),
+        //           onPressed: () {
+        //             _homeController.deleteTask(task: _homeController.tasks[index]);
+        //           },
+        //         ),
+        //       );
+        //     },
+        //   );
+        // }),
         floatingActionButton: FloatingActionButton(
           onPressed: () {
             _showDiloag(
@@ -82,7 +113,6 @@ class HomeScreen extends StatelessWidget {
       ),
     );
   }
-
 
   Future<dynamic> _showDiloag({
     required BuildContext context,

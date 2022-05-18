@@ -7,12 +7,17 @@ class HomeController extends GetxController {
   FirebaseFirestore _db = FirebaseFirestore.instance;
   FirebaseAuth _auth = FirebaseAuth.instance;
 
-  RxList<TaskModel> tasks = <TaskModel>[].obs;
-  RxBool state = false.obs;
+  List<TaskModel> tasks = [];
+  bool state = false;
 
-  createTask({
+  onInit() {
+    super.onInit();
+    getTasks();
+  }
+
+  Future<void> createTask({
     required String textTask,
-  }) {
+  }) async {
     TaskModel _task = TaskModel(
       task: textTask,
       date: DateTime.now().toString(),
@@ -27,29 +32,39 @@ class HomeController extends GetxController {
       value.update({
         "taskID": value.id,
       });
+      _task.taskID = value.id;
+      tasks.insert(0, _task);
+      update();
     });
-
   }
 
-  getTasks() {
-    state.value = true;
-    _db
+  Future<void> getTasks() async {
+    tasks = [];
+    state = true;
+    update();
+    await _db
         .collection("users")
         .doc(_auth.currentUser!.uid)
         .collection("tasks")
         .orderBy("date", descending: true)
-        .snapshots()
-        .listen((event) {
-      tasks.clear();
-
-      event.docs.forEach((element) {
+        .get()
+        .then((value) {
+      value.docs.forEach((element) {
         tasks.add(TaskModel.formJson(element.data()));
       });
     });
-    state.value = false;
+    state = false;
+    update();
   }
 
-  deleteTask({required taskID}) {
-    _db.collection("users").doc(_auth.currentUser!.uid).collection("tasks").doc(taskID).delete();
+  Future<void> deleteTask({required TaskModel task}) async {
+    tasks.remove(task);
+    update();
+    _db
+        .collection("users")
+        .doc(_auth.currentUser!.uid)
+        .collection("tasks")
+        .doc(task.taskID)
+        .delete();
   }
 }
